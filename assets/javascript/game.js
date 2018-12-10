@@ -1,6 +1,9 @@
 // 1. global variable declaration (track game state)
 var playerSelected = false;
 var enemySelected = false;
+var playerIdentity;
+var enemyIdentity;
+var aPMultiplier;
     //enemy and player var set to number
 
 // 2. game objects (player characters)
@@ -12,8 +15,9 @@ var player1 = {
     healthPoints: 75,
     attackPower: 12,
     counterAttackPower: 10,
-    player: false,
-    enemy: false
+    valueOf() {
+        return this.attackPower;
+    }
 }
     
     //player 2
@@ -23,8 +27,9 @@ var player2 = {
     healthPoints: 90,
     attackPower: 10,
     counterAttackPower: 9,
-    player: false,
-    enemy: false
+    valueOf() {
+        return this.attackPower;
+    }
 }
 
     // player 3
@@ -34,8 +39,9 @@ var player3 = {
     healthPoints: 115,
     attackPower: 8,
     counterAttackPower: 8,
-    player: false,
-    enemy: false
+    valueOf() {
+        return this.attackPower;
+    }
 }
 
     //player 4
@@ -45,8 +51,9 @@ var player4 = {
     healthPoints: 130,
     attackPower: 6,
     counterAttackPower: 7,
-    player: false,
-    enemy: false
+    valueOf() {
+        return this.attackPower;
+    }
 }
 
 // 3. jQuery element moving logic
@@ -69,15 +76,20 @@ var player4 = {
         appendPlayer("#player-4", player4);
     });
 
-function appendPlayer(selection, playerObject) {
+function appendPlayer(htmlSelection, characterObject) {
     if (playerSelected === false) {
-        $(selection).appendTo("#player-area");
+        $(htmlSelection).appendTo("#player-area");
         playerSelected = true;
-        playerObject.player = true;
+        playerIdentity = characterObject;
+        console.log("player identity: " + htmlSelection); 
+        // assign attack power modifier to selected player, used in calculateDamage()
+        aPMultiplier = characterObject.valueOf();
+
     } else if (enemySelected === false) {
-        $(selection).appendTo("#enemy-area");
+        $(htmlSelection).appendTo("#enemy-area");
         enemySelected = true;
-        playerObject.enemy = true;
+        enemyIdentity = characterObject;
+        console.log("enemy identity:" + htmlSelection);
     }
 }
     // if enemy clicked, move to enemy area
@@ -90,31 +102,33 @@ function appendPlayer(selection, playerObject) {
 
 // 4. attack logic
 function onAttack() {
-    var tempPlayer;
-    var tempEnemy;
     // attack clicked while no enemy chosen, show error message
-    if (player1.player === true) {tempPlayer = player1};
-    if (player1.enemy === true) {tempEnemy = player1};
-
-    if (player2.player === true) {tempPlayer = player2};
-    if (player2.enemy === true) {tempEnemy = player2};
-
-    if (player3.player === true) {tempPlayer = player3};
-    if (player3.enemy === true) {tempEnemy = player3};
-
-    if (player4.player === true) {tempPlayer = player4};
-    if (player4.enemy === true) {tempEnemy = player4};
-
+    if (enemySelected === false) {
+        console.log("error, can't attack until an enemy is selected");
+        // TODO send error to log section
+    } else { 
+        console.log("calculating damage...");
+        calculateDamage(playerIdentity, enemyIdentity);
+    }
+}
     // compute comparison attack points, counter attack power, health points
-
+function calculateDamage(player, enemy) {           
+    console.log("attack modifier set to: " + aPMultiplier);
         // player vs. enemy
-
+    enemy.healthPoints -= player.attackPower;
+    console.log("the enemy's health has been reduced to " + enemy.healthPoints);
         // enemy vs. player (no damage on winning round)
-
+    if (enemy.healthPoints > 0) {
+        player.healthPoints -= enemy.attackPower;
+        console.log("the player's health has been reduced to " + player.healthPoints);
+        player.attackPower += aPMultiplier;
+        console.log("player's attack power has grown to: " + player.attackPower);
+    }
         // if enemy defeated, enemySelected = false
 
     // triggers game ending if player HP = 0 OR all enemies dead
 }
+
 // 5. game ending/reset (on-click)
 function reset() {
 
@@ -129,30 +143,23 @@ function reset() {
     // reset player stats & global variables in (1./2.)
     playerSelected = false;
     enemySelected = false;
+    aPMultiplier = 0;
 
     player1.healthPoints = 75;
     player1.attackPower = 12;
     player1.counterAttackPower = 10;
-    player1.player = false;
-    player1.enemy = false;
 
     player2.healthPoints = 90;
     player2.attackPower = 10;
     player2.counterAttackPower = 9;
-    player2.player = false;
-    player2.enemy = false;
 
     player3.healthPoints = 115;
     player3.attackPower = 8;
     player3.counterAttackPower = 8;
-    player3.player = false;
-    player3.enemy = false;
 
     player4.healthPoints = 130;
     player4.attackPower = 6;
     player4.counterAttackPower = 7;
-    player4.player = false;
-    player4.enemy = false;
 }
 // 6. sound
 
