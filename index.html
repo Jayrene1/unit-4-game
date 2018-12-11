@@ -20,8 +20,8 @@
     <header>
         <div class="jumbotron jumbotron-fluid bg-dark">
             <div class="container text-center text-light">
-                <h1 class="display-4">Slapfight</h1>
-                <p class="lead">A gentle conflict game by Joshua Arcega</p>
+                <h1 class="display-4">SlapByte</h1>
+                <p class="lead">A pixellated conflict by Joshua Arcega</p>
             </div>
         </div>
     </header>
@@ -29,54 +29,66 @@
     <!--Main-->
     <div class="container">
         <!--Character waiting area-->
-        <div class="row">
+        <div class="row set-height custom-border">
             <!--each player has div id for easy movement to other divs-->
-            <div id="waiting-1" class="col-md-3 m-auto">                
+            <div id="waiting-1" class="col-md-3 m-auto text-center">                
                 <div id="player-1">
-                    <p>player 1 placeholder</p>
+                    <img id="player-1-image" src="assets/images/knight/knight-idle.png" alt="Knight image">
+                    <h3>Knight</h3>
                 </div>
             </div>
 
-            <div id="waiting-2" class="col-md-3 m-auto">                
+            <div id="waiting-2" class="col-md-3 m-auto text-center">                
                 <div id="player-2">
-                    <p>player 2 placeholder</p>
+                    <img id="player-2-image" src="assets/images/dwarf/dwarf-idle.png" alt="Dwarf Image">
+                    <h3>Dwarf</h3>
                 </div>
             </div>
 
-            <div id="waiting-3" class="col-md-3 m-auto">                
+            <div id="waiting-3" class="col-md-3 m-auto text-center">                
                 <div id="player-3">
-                    <p>player 3 placeholder</p>
+                    <img id="player-3-image" src="assets/images/sorcerer/sorcerer-idle.png" alt="Sorcerer Image">                    
+                    <h3>Sorcerer</h3>
                 </div>
             </div>
 
-            <div id="waiting-4" class="col-md-3 m-auto">                
+            <div id="waiting-4" class="col-md-3 m-auto text-center">                
                 <div id="player-4">
-                    <p>player 4 placeholder</p>
+                    <img id="player-4-image" src="assets/images/ghost/ghost-idle.png" alt="Player 4 Image">
+                    <h3>Ghost</h3>
                 </div>
             </div>    
         </div>
         
         <!--Current enemy area-->
-        <div class="row">
-            <div id="enemy-area" class="col-md-4 m-auto">
-                <p>ENEMY AREA placeholder</p>
+        <div class="row set-height">
+            <div class="col-md-4 m-auto text-center">
+                <h2>Instructions</h2>
+                <p>
+                    Choose a character to play, and then choose an enemy. Press attack to fight the enemy. Defeat all 3 to win.
+                </p>
+            </div>
+
+            <div id="enemy-area" class="col-md-4 m-auto text-center custom-border-left custom-border-right">
+            </div>
+
+            <div class="col-md-4 text-center mb-auto pt-3">
+                <h2>Log</h2>
+                <p id="log"></p>
             </div>
         </div>
 
         <!--Current player area-->
-        <div class="row">
-            <div class="col-md-4">
-                <p>ATTACK placeholder</p>
+        <div class="row set-height align-items-center custom-border">
+            <div class="col-md-4 text-center">
 
-                <button type="button" class="btn btn-danger" onclick="onAttack()">Attack</button>            
+                <button type="button" class="btn btn-lg btn-danger" onclick="onAttack()">Attack</button>            
             </div>
-            <div id="player-area" class="col-md-4">
-                    <p>PLAYER AREA placeholder</p>
+            <div id="player-area" class="col-md-4 text-center">
             </div>
-            <div class="col-md-4">
-                <p>LOG placeholder</p>
+            <div class="col-md-4 text-center">
                 
-                <button type="button" class="btn btn-primary" onclick="reset()">Reset</button>            
+                <button type="button" class="btn btn-lg btn-primary" onclick="reset()">Reset</button>            
             </div>
         </div>
     </div>
