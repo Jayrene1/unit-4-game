@@ -1,4 +1,4 @@
-# unit-4-game
+# SlapByte
 A JS/jQuery game where users choose a character and attack other characters
 
 ## Coding with vanilla Javascript
