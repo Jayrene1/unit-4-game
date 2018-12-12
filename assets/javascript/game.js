@@ -14,9 +14,9 @@ var player1 = {
     name: "Knight",
     htmlID: "#player-1",
     htmlImage: "#player-1-image",
-    healthPoints: 75,
-    attackPower: 12,
-    counterAttackPower: 10,
+    healthPoints: 120,
+    attackPower: 9,
+    counterAttackPower: 15,
     imageIdle: "assets/images/knight/knight-idle.png",
     imageIdle2: "assets/images/knight/knight-idle-up.png",
     imageAttack: "assets/images/knight/knight-attack-down.gif",
@@ -31,9 +31,9 @@ var player2 = {
     name: "Dwarf",
     htmlID: "#player-2",
     htmlImage: "#player-2-image",
-    healthPoints: 90,
-    attackPower: 10,
-    counterAttackPower: 9,
+    healthPoints: 100,
+    attackPower: 14,
+    counterAttackPower: 5,
     imageIdle: "assets/images/dwarf/dwarf-idle.png",
     imageIdle2: "assets/images/dwarf/dwarf-idle-up.png",
     imageAttack: "assets/images/dwarf/dwarf-attack-down.gif",
@@ -48,9 +48,9 @@ var player3 = {
     name: "Sorcerer",
     htmlID: "#player-3",
     htmlImage: "#player-3-image",
-    healthPoints: 115,
-    attackPower: 8,
-    counterAttackPower: 8,
+    healthPoints: 150,
+    attackPower: 7,
+    counterAttackPower: 20,
     imageIdle: "assets/images/sorcerer/sorcerer-idle.png",
     imageIdle2: "assets/images/sorcerer/sorcerer-idle.png",
     imageAttack: "assets/images/sorcerer/sorcerer-attack.gif",
@@ -65,9 +65,9 @@ var player4 = {
     name: "Ghost",
     htmlID: "#player-4",
     htmlImage: "#player-4-image",
-    healthPoints: 130,
-    attackPower: 6,
-    counterAttackPower: 7,
+    healthPoints: 180,
+    attackPower: 5,
+    counterAttackPower: 25,
     imageIdle: "assets/images/ghost/ghost-idle.png",
     imageIdle2: "assets/images/ghost/ghost-idle.png",
     imageAttack: "assets/images/ghost/ghost-attack.gif",
@@ -121,8 +121,9 @@ function appendPlayer(htmlID, characterObject) {
         $(htmlID).appendTo("#enemy-area");
         enemySelected = true;
         enemyIdentity = characterObject;
-        displayStats(characterObject); // displays enemy stats on selection
+        displayStatsEnemy(characterObject); // displays enemy stats on selection
         soundOfChoice(); // player chosen sound trigger
+        $("#log").text("- FIGHT!"); // display fight message now that both characters are chosen    
         console.log("enemy identity:" + htmlID);
     }
 }
@@ -137,7 +138,7 @@ function onAttack() {
     if (enemySelected === false) {
         console.log("error, can't attack until an enemy is selected");
         $("#log").text("- Must select an enemy first");// send error to log section
-    } else { 
+    } else if (gameOver(playerIdentity) === false) { 
         console.log("calculating damage...");
         calculateDamage(playerIdentity, enemyIdentity);
     }
@@ -149,20 +150,21 @@ function calculateDamage(player, enemy) {
         
     // player attack
     enemy.healthPoints -= player.attackPower;
-    displayStats(player); // updates player stats
+    displayStatsEnemy(enemy); // updates enemy stats
     imageOfAttack(player); // attack animation
     soundOfAttack(player); // sound trigger
     console.log("the enemy's health has been reduced to " + enemy.healthPoints);
     $("#log").text("- You attacked the enemy!"); // display attack result    
     // enemy attack (no damage on winning round)
     if (enemy.healthPoints > 0 && player.healthPoints > 0) {
-        player.healthPoints -= enemy.attackPower;
-        displayStats(enemy); // updates enemy stats
+        player.healthPoints -= enemy.counterAttackPower;
         imageOfAttack(enemy); // attack animation
-        console.log("the player's health has been reduced to " + player.healthPoints);
         player.attackPower += aPModifer;
+        displayStats(player); // updates player stats
+        console.log("the player's health has been reduced to " + player.healthPoints);
         console.log("player's attack power has grown to: " + player.attackPower);
-
+        gameOver(player);
+        
     // if enemy HP = 0, hide and check if game over
     } else if (enemy.healthPoints <= 0) {
         enemySelected = false;
@@ -170,12 +172,10 @@ function calculateDamage(player, enemy) {
         deadEnemies.push(enemy.name);
         console.log("the dead enemies are: " + deadEnemies + ". pick a new enemy");
         $("#log").text("- The enemy died!"); // display death result    
+        soundOfDeath(); // trigger death sound
         gameOver(player);
 
     // if player HP <= 0, end game
-    } else if (player.healthPoints <= 0) {
-        $(player.htmlID).hide();
-        gameOver(player);
     }
 }
 
@@ -213,42 +213,34 @@ function reset() {
     aPModifer = 0;
     deadEnemies = [];
 
-    player1.healthPoints = 75;
-    player1.attackPower = 12;
-    player1.counterAttackPower = 10;
+    player1.healthPoints = 120;
+    player1.attackPower = 9;
 
-    player2.healthPoints = 90;
-    player2.attackPower = 10;
-    player2.counterAttackPower = 9;
+    player2.healthPoints = 100;
+    player2.attackPower = 14;
 
-    player3.healthPoints = 115;
-    player3.attackPower = 8;
-    player3.counterAttackPower = 8;
+    player3.healthPoints = 150;
+    player3.attackPower = 7;
 
-    player4.healthPoints = 130;
-    player4.attackPower = 6;
-    player4.counterAttackPower = 7;
+    player4.healthPoints = 180;
+    player4.attackPower = 5;
 }
 
     // game over conditional check. returns true/false for animation/sound triggers
 function gameOver(player) {
     // check if all 3 enemies are dead
-    if (deadEnemies.length < 3) {
-        soundOfDeath(); // trigger death sound
-        return false;
+    if (player.healthPoints <= 0) {
+        // check if player is dead
+        $(player.htmlID).hide();
+        soundOfLosing(); // game losing sound effect
+        console.log("THE PLAYER HAS DIED. HIT RESET.");
+        $("#log").append("<br>" + "- The player died. You lost."); // display Win message   
+        return true;
     } else if (deadEnemies.length == 3) {
         // TODO log "the enemies are dead! Hit reset to play again."
         soundOfWinning(); // game winning sound effect
         console.log("THE ENEMIES ARE DEAD. HIT RESET.");
-        $("#log").append("<br>" + "- YOU WON!"); // display attack result    
-        return true;
-    }
-    
-    // check if player is dead
-    else if (player.healthPoints <= 0) {
-        // TODO log "the player has died. Hit reset to play again."
-        soundOfLosing(); // game losing sound effect
-        console.log("THE PLAYER HAS DIED. HIT RESET.");
+        $("#log").append("<br>" + "- YOU WON!"); // display Win message   
         return true;
     } else {
         return false;
@@ -263,6 +255,7 @@ function gameOver(player) {
 function soundOfChoice() {
     var audio;
     audio = new Audio('assets/audio/character-chosen.ogg');
+    audio.volume = 0.15;
     audio.play();
 }
 
@@ -279,6 +272,7 @@ function soundOfAttack(player) {
         case player4: audio = new Audio('assets/audio/ghost-attack.ogg');
         break;
     }
+    audio.volume = 0.1;
     audio.play();
 }
 
@@ -286,12 +280,14 @@ function soundOfAttack(player) {
 function soundOfDeath() {
     var audio;
     audio = new Audio('assets/audio/death.ogg');
+    audio.volume = 0.2;
     audio.play();
 }
     // game won sound, game loss sound
 function soundOfWinning() {
     var audio;
     audio = new Audio('assets/audio/game-win.ogg');
+    audio.volume = 0.3;
     audio.play();
 
 }
@@ -299,6 +295,7 @@ function soundOfWinning() {
 function soundOfLosing() {
     var audio;
     audio = new Audio('assets/audio/game-loss.ogg');
+    audio.volume = 0.3;
     audio.play();
 }
 
@@ -306,6 +303,10 @@ function soundOfLosing() {
     // text stats update for each character
 function displayStats(player) {
     $(player.htmlID + " > h3").text("HP: " + player.healthPoints + " | AP: " + player.attackPower);
+}
+
+function displayStatsEnemy(enemy) {
+    $(enemy.htmlID + " > h3").text("HP: " + enemy.healthPoints + " | cAP: " + enemy.counterAttackPower);
 }
 
     // text or image animation on attack
